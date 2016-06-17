@@ -1,6 +1,9 @@
 var React = require("react");
 var emojione = require("emojione");
 
+emojione.imageType = 'png'; 
+emojione.sprites = true;
+
 var Emoji = React.createClass({
   propTypes: {
     onClick: React.PropTypes.func
