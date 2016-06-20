@@ -1,8 +1,9 @@
 var React = require("react");
 var emojione = require("emojione");
 
-emojione.imageType = 'png'; 
+emojione.imageType = 'svg';
 emojione.sprites = true;
+emojione.imagePathSVGSprites = '';
 
 var Emoji = React.createClass({
   propTypes: {

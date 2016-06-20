@@ -6,8 +6,9 @@ var emojione = require("emojione");
 var store = require("store");
 var _ = require("underscore");
 
-emojione.imageType = 'png'; 
+emojione.imageType = 'svg';
 emojione.sprites = true;
+emojione.imagePathSVGSprites = '';
 
 var Picker = React.createClass({
     propTypes: {
