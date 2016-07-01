@@ -1,14 +1,11 @@
 var React = require("react");
 var Emoji = require("./emoji");
+var LazyLoad = require("react-lazyload").default;
 var Modifiers = require("./modifiers");
 var strategy = require("./strategy");
 var emojione = require("emojione");
 var store = require("store");
 var _ = require("underscore");
-
-emojione.imageType = 'svg';
-emojione.sprites = true;
-emojione.imagePathSVGSprites = '';
 
 var Picker = React.createClass({
     propTypes: {
@@ -181,9 +178,15 @@ var Picker = React.createClass({
 
             if (!search || !term || modified.keywords.some(function(keyword) { return new RegExp("^"+term).test(keyword); })) {
 
-              return <li key={modified.unicode}><Emoji {...modified} aria-label={modified.name} role="option" onClick={function(){
-                onChange(modified);
-              }}/></li>;
+              return (
+                      <li key={modified.unicode}>
+                        <LazyLoad once={true} key={modified.unicode} height={32} offset={[0, 0]} overflow={true} debounce={300} scroll={false}>
+                          <Emoji {...modified} aria-label={modified.name} 
+                                                role="option" 
+                                                onClick={function(){onChange(modified);}}/>
+                        </LazyLoad>
+                      </li>
+                    );
             }
           });
 
