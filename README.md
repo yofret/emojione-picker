@@ -69,7 +69,7 @@ npm install
 npm run preview
 ```
 
-Open `examples/index.html` in a browser to see a preview of the picker. To create a release:
+Open `http://localhost/emojione-picker/examples/` in a browser to see a preview of the picker. To create a release:
 
 ```
 npm run build
