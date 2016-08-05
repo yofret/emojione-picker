@@ -16,7 +16,7 @@ var Emoji = React.createClass({
   },
   
   render: function() {
-    return <div {...this.props} onClick={this.props.onClick} tabIndex="0" className="emoji" 
+    return <div onClick={this.props.onClick} tabIndex="0" className="emoji" 
                 title={this.props.name} 
                 dangerouslySetInnerHTML={this.createMarkup()}>
     </div>

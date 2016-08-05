@@ -1,3 +1,13 @@
+.emojione {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0;
+  top:0;
+  border: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
 .emoji-dialog {
   width: 276px;
   height: 220px;
