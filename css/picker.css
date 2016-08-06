@@ -8,6 +8,18 @@
   height: 1.6rem;
 }
 
+.emoji-row {
+  height: 26px;
+  white-space: nowrap;
+}
+
+.emoji-row div {
+  display: inline-block;
+  text-align: center;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
 .emoji-dialog {
   width: 276px;
   height: 220px;

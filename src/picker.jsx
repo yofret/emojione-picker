@@ -2,6 +2,8 @@ var React = require("react");
 var Emoji = require("./emoji");
 var Modifiers = require("./modifiers");
 var strategy = require("./strategy");
+var Row = require("./row");
+var LazyLoad = require("react-lazyload").default;
 var emojione = require("emojione");
 var store = require("store");
 var _ = require("underscore");
@@ -57,7 +59,6 @@ var Picker = React.createClass({
         modifier: store.get('emoji-modifier') || 0,
         rendered: 0,
         category: false,
-        term: this.props.search !== true ? this.props.search : ""
       };
     },
 
@@ -66,12 +67,7 @@ var Picker = React.createClass({
     },
 
     componentDidMount: function() {
-      this.refs.grandlist.addEventListener('scroll', this.updateActiveCategory);
       this.updateActiveCategory();
-    },
-
-    componentWillUnmount: function() {
-      this.refs.grandlist.removeEventListener('scroll', this.updateActiveCategory);
     },
 
     componentWillReceiveProps: function(nextProps) {
@@ -80,19 +76,16 @@ var Picker = React.createClass({
       }
     },
 
-    componentDidUpdate: function(prevProps, prevState) {
-      if (this.state.rendered < Object.keys(this.props.categories).length) {
-        setTimeout(function(){
-          if (this.isMounted()) {
-            this.setState({rendered: this.state.rendered+1});
-          }
-        }.bind(this), 0);
-      }
-    },
+    // componentDidUpdate: function(prevProps, prevState) {
+    //   if (this.state.rendered < Object.keys(this.props.categories).length) {
+    //     setTimeout(function(){
+    //       if (this.isMounted()) {
+    //         this.setState({rendered: this.state.rendered+1});
+    //       }
+    //     }.bind(this), 0);
+    //   }
+    // },
 
-    updateSearchTerm: function() {
-      this.setState({term: this.refs.search.value});
-    },
 
     updateActiveModifier: function(modifier) {
       this.setState({modifier: modifier});
@@ -141,6 +134,7 @@ var Picker = React.createClass({
     }, 100),
 
     jumpToCategory: function(name) {
+      this.setState({category: name});
       var offsetTop = this.refs[name].offsetTop;
       var padding = 5;
       this.refs.grandlist.scrollTop = offsetTop-padding;
@@ -162,40 +156,36 @@ var Picker = React.createClass({
 
     getEmojis: function() {
       var sections = [];
-      var onChange = this.props.onChange;
-      var search = this.props.search;
-      var term = this.state.term;
       var modifier = this.state.modifier;
+      var term = this.state.term;
       var i = 0;
 
       // render emoji in category sized chunks to help prevent UI lockup
       _.each(this.props.categories, function(category, key) {
         var list = this.state.emojis[key];
-        if (list && Object.keys(list).length && i < this.state.rendered) {
-          list = _.map(list, function(data){
-            var modified = modifier && data[modifier] ? data[modifier] : data[0];
+        var rows = [];
+        
+        list = _.map(list, function(data){
+          var modified = modifier && data[modifier] ? data[modifier] : data[0];
+          return modified;
+        });
 
-            if (!search || !term || modified.keywords.some(function(keyword) { return new RegExp("^"+term).test(keyword); })) {
+        list = _.compact(list);
 
-              return (
-                      <li key={modified.unicode}>
-                        <Emoji {...modified} aria-label={modified.name} 
-                                              role="option" 
-                                              onClick={function(){onChange(modified);}}/>
-                      </li>
-                    );
-            }
-          });
-
-          if (_.compact(list).length) {
-            sections.push(<div className="emoji-category" key={key} ref={key}>
-              <h2 className="emoji-category-header">{category.title}</h2>
-              <ul className="emoji-category-list">{list}</ul>
-            </div>);
-          }
-
-          i++;
+        while(list.length) {
+          rows.push(
+            <LazyLoad key={++i} height={26} once={true} offset={130} overflow={true}>     
+              <Row emojiGroup={list.splice(0,8)} select={this.props.onChange} />
+            </LazyLoad>
+          );
         }
+
+        sections.push(
+          <div className="emoji-category" key={key} ref={key}>
+            <h2 className="emoji-category-header">{category.title}</h2>
+            <ul className="emoji-category-list">{rows}</ul>
+          </div>
+        );
       }.bind(this));
 
       return sections;
@@ -205,14 +195,6 @@ var Picker = React.createClass({
       // we hide the color tone modifiers when searching to reduce clutter
       if (!this.state.term) {
         return <Modifiers active={this.state.modifier} onChange={this.updateActiveModifier} />
-      }
-    },
-
-    getSearchInput: function() {
-      if (this.props.search === true) {
-        return <div className="emoji-search-wrapper">
-          <input className="emoji-search" type="search" placeholder="Search..." ref="search" onChange={this.updateSearchTerm} />
-        </div>;
       }
     },
 
@@ -226,7 +208,6 @@ var Picker = React.createClass({
         </header>
         <div className="emoji-grandlist" ref="grandlist" role="listbox">
           {this.getModifiers()}
-          {this.getSearchInput()}
           {this.getEmojis()}
         </div>
       </div>
