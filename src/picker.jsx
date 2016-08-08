@@ -160,7 +160,7 @@ var Picker = React.createClass({
       var term = this.state.term;
       var i = 0;
 
-      // render emoji in category sized chunks to help prevent UI lockup
+      // render Emojis in rows with lazyload
       _.each(this.props.categories, function(category, key) {
         var list = this.state.emojis[key];
         var rows = [];
